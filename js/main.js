@@ -1,6 +1,5 @@
+
 document.addEventListener('DOMContentLoaded', function () {
-
-
 
     const game = document.getElementById('game');
     const context = game.getContext('2d');
@@ -13,6 +12,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const score = document.querySelector('#score');
     const startButton = document.querySelector('.startButton');
 
+    function keyDownReader(event) {
+        event.preventDefault();
+        GameVar.snake.setDirection(event.keyCode);
+    }
 
     function Snake( variableX) {
 
@@ -109,16 +112,41 @@ document.addEventListener('DOMContentLoaded', function () {
         };
 
         this.shortenSnake = function (length) {
-            this.length= this.length - length;
+
+
+            console.log(this.positionsY);
+            console.log(this.positionsX);
+
+
+            console.log(this.length);
+            this.length = this.length - parseInt(length);
+
+
+            if(this.length<3){
+                this.length = 3;
+            }
+
+            console.log(this.length)
+            let arraylength = this.positionsX.length;
+
+            console.log(this.positionsX.length);
+
+            this.positionsX = this.positionsX.slice((-this.length+1));
+            this.positionsY = this.positionsY.slice((-this.length+1));
+
+            console.log(this.positionsX.length);
+            console.log( this.positionsY);
+            console.log( this.positionsX);
         };
 
         this.lengthenSnake = function (length) {
-            this.length= this.length + length;
+            this.length = this.length + parseInt(length);
         };
 
     }
 
     function Board(level) {
+
         this.obstaclePositionX = [];
         this.obstaclePositionY = [];
 
@@ -191,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function () {
         this.obstacles = {
             positionsX: positionsX,
             positionsY: positionsY
-        }
+        };
 
         this.positionX = [];
         this.positionY = [];
@@ -204,7 +232,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 this.positionY = Math.round((Math.random()*-39));
                 console.log(this.positionY);
 
-
                 let check =false;
                 for(let j = 0; j<this.obstacles.positionsX.length; j++){
                     if(this.positionX === this.obstacles.positionsX[j] && this.positionY === this.obstacles.positionsY[j]){
@@ -215,7 +242,45 @@ document.addEventListener('DOMContentLoaded', function () {
                     i=1;
                 }
             }
+
         }
+    }
+
+    function PowerUp(positionsX, positionsY) {
+
+        this.obstacles = {
+            positionsX: positionsX,
+            positionsY: positionsY
+        };
+
+        this.typeOfPowerUp = 0;
+        this.positionX = 0;
+        this.positionY = 0;
+        this.powerUpMuliplier = 1;
+
+        this.generateProperties = function () {
+            let i = 0;
+
+            while(i!==1){
+                this.positionX = Math.round((Math.random()*39));
+                this.positionY = Math.round((Math.random()*-39));
+                console.log(this.positionY);
+
+                let check =false;
+                for(let j = 0; j<this.obstacles.positionsX.length; j++){
+                    if(this.positionX === this.obstacles.positionsX[j] && this.positionY === this.obstacles.positionsY[j]){
+                        check = true;
+                    }
+                }
+
+                this.typeOfPowerUp = 0.5;//Math.random()*6;
+
+                if(check === false) {
+                    i=1;
+                }
+            }
+        }
+
     }
 
     function Game(){
@@ -223,6 +288,12 @@ document.addEventListener('DOMContentLoaded', function () {
         this.snake = 0;
         this.board = 0;
         this.apple = 0;
+        this.powerUp = 0;
+        this.numberOfEatenApples = 0;
+        this.showPowerUp = false;
+        this.powerUpTimer = 0;
+        this.invisible = false;
+
 
         const self = this;
         this.time = 0;
@@ -236,48 +307,60 @@ document.addEventListener('DOMContentLoaded', function () {
         this.score = 0;
         this.scoreboard = [];
         this.gameTimer= 0;
-        this.stateOfGame = 0;
 
-        this.render = function () {
-            self.renderObstacles();
-            self.renderSnake();
-            self.renderApple();
-        };
 
         this.renderObstacles = function () {
             context.fillStyle = "rgb(0,0,0)"; //Black
             for(let i = 0; i<this.board.obstaclePositionX.length; i++){
-                context.fillRect(this.board.obstaclePositionX[i]*10,this.board.obstaclePositionY[i]*-10, 10, 10);
+                context.fillRect(this.board.obstaclePositionX[i]*15,this.board.obstaclePositionY[i]*-15, 15, 15);
             }
         };
 
         this.renderSnake = function () {
             context.fillStyle = "rgb(0,128,0)"; //Dark Green
             for(let i = 0; i<this.snake.length-this.settings.X; i++){
-                context.fillRect(this.snake.positionsX[i]*10,this.snake.positionsY[i]*-10, 10, 10);
+                context.fillRect(this.snake.positionsX[i]*15,this.snake.positionsY[i]*-15, 15, 15);
             }
         };
 
         this.renderApple = function () {
             context.fillStyle = "rgb(0,255,0)"; //Green
-            context.fillRect(this.apple.positionX*10,this.apple.positionY*-10, 10, 10);
+            context.fillRect(this.apple.positionX*15,this.apple.positionY*-15, 15, 15);
 
         };
-
 
         this.renderPowerUp = function () {
             context.fillStyle = "rgb(255,255,102)"; //Yellow
+            context.fillRect(this.powerUp.positionX*15,this.powerUp.positionY*-15, 15, 15);
         };
 
-
-        this.checkCollisionApple = function () {
-            if(self.apple.positionX === self.snake.positionsX[self.snake.positionsX.length-1] && self.apple.positionY === self.snake.positionsY[self.snake.positionsY.length-1] ){
-                self.snake.lengthenSnake(1);
-                self.apple.generateNewLocation();
-                self.score+=50;
+        this.render = function () {
+            console.log('Lol');
+            self.renderObstacles();
+            self.renderSnake();
+            self.renderApple();
+            if(this.showPowerUp){
+                self.renderPowerUp();
             }
         };
 
+
+        //Checking collisions with specific of snake
+        this.checkCollisionApple = function () {
+            if(this.apple.positionX === this.snake.positionsX[this.snake.positionsX.length-1] && this.apple.positionY === this.snake.positionsY[this.snake.positionsY.length-1] ){
+                this.snake.lengthenSnake(1);
+                this.apple.generateNewLocation();
+                this.score= this.score + (50*this.settings.level*this.settings.speed);
+
+                console.log(this.snake.length);
+                this.numberOfEatenApples++;
+
+                if(this.numberOfEatenApples%2 === 0){
+                    this.powerUp.generateProperties();
+                    this.showPowerUp = true;
+                }
+            }
+        };
 
         this.checkCollisionWithSnake = function () {
             for(let i = 0; i< self.snake.positionsX.length-1; i++){
@@ -285,36 +368,145 @@ document.addEventListener('DOMContentLoaded', function () {
                     self.gameOver();
                 }
             }
-        }
+        };
 
-        this.startGame = function () {
-            let counter = 0;
-            this.gameTimer = setInterval(function () {
+        this.checkCollisionWithObstacles = function () {
+            for(let i = 0; i< self.board.obstaclePositionX.length; i++){
+                if(self.snake.positionsX[self.snake.positionsX.length-1] === self.board.obstaclePositionX[i] && self.snake.positionsY[self.snake.positionsY.length-1] === self.board.obstaclePositionY[i]){
+                    self.gameOver();
+                }
+            }
+        };
 
-                    if(counter%10 === 0){
-                        self.time ++;
-                        time.innerHTML = 'Gra trwa ' + self.time + 's';
+        this.checkCollisionWithPowerUp = function () {
+
+            if(this.powerUp.positionX === this.snake.positionsX[this.snake.positionsX.length-1] && this.powerUp.positionY === this.snake.positionsY[this.snake.positionsY.length-1] ){
+
+                this.showPowerUp = false;
+                if(self.powerUp.typeOfPowerUp<=1){
+                    self.snake.lengthenSnake(self.settings.X);
+                    console.log('Wydłużanie');
+
+                } else {
+                    if(self.powerUp.typeOfPowerUp<2 && self.powerUp.typeOfPowerUp>1){
+                        self.snake.shortenSnake(self.settings.X);
+                        console.log('Skracanie');
+                    } else {
+                        if(self.powerUp.typeOfPowerUp<3 && self.powerUp.typeOfPowerUp>=2){
+
+                            self.powerUp.powerUpMuliplier = 2;
+                            self.powerUpTimer= setTimeout(
+                                function () {
+                                    self.powerUp.powerUpMuliplier = 1;
+                                    clearTimeout(self.powerUpTimer);
+                                }
+                            , 1000*self.settings.Y);
+
+                            console.log('Przyspieszenie');
+                        } else {
+                            if(self.powerUp.typeOfPowerUp<4 && self.powerUp.typeOfPowerUp>=3){
+
+                                self.powerUp.powerUpMuliplier = 0.5;
+                                self.powerUpTimer= setTimeout(
+                                    function () {
+                                        self.powerUp.powerUpMuliplier = 1;
+                                        clearTimeout(self.powerUpTimer);
+                                    }
+                                    , 1000*self.settings.Y);
+
+                                console.log('Spowolnienie');
+                            } else {
+                                if(self.powerUp.typeOfPowerUp<5 && self.powerUp.typeOfPowerUp>=4){
+                                    this.score+= (50*this.settings.level*this.settings.speed)*this.settings.X;
+                                    console.log('Punkty');
+                                } else {
+                                    self.invisible = true;
+                                    self.powerUpTimer= setTimeout(
+                                        function () {
+                                            self.invisible = false;
+                                            clearTimeout(self.powerUpTimer);
+                                        }
+                                        , 1000*self.settings.Y);
+                                    console.log('Przenikanie');
+                                }
+                            }
+                        }
                     }
 
-                    if(counter%1 === 0){
+                }
+
+
+            }
+
+        };
+
+
+        //Start game function
+        this.startGame = function () {
+
+            let counter = 0;
+
+            self.time = 0;
+            self.score =0;
+
+            this.gameTimer = setInterval(function () {
+
+                if(counter%(100*(1/(self.settings.speed*self.powerUp.powerUpMuliplier))) === 0){
+
                         self.snake.move();
-                        context.clearRect(0, 0, 400, 400);
+                        context.clearRect(0, 0, 600, 600);
                         self.render();
                         self.checkCollisionApple();
                         self.checkCollisionWithSnake();
+                        if(!self.invisible){
+                            self.checkCollisionWithObstacles();
+                        }
+                        if(self.showPowerUp){
+                            self.checkCollisionWithPowerUp();
+                        }
+
                         score.innerHTML = 'Twój wynik: ' + self.score;
                     }
-                    counter++;
 
-            }, 100)
+                if(counter%1000 === 0){
+                    self.time ++;
+                    time.innerHTML = 'Gra trwa ' + self.time + 's';
+                    counter = 0;
+                }
+
+                counter+=25;
+
+            }, 25)
+
         };
 
+        //Game Over function
         this.gameOver = function () {
+
+            //Stop timer
             clearInterval(this.gameTimer);
-            context.clearRect(0, 0, 400, 400);
+
+            //Create GAME OVER screen
+            context.clearRect(0, 0, 600, 600);
+            context.font="100px Georgia";
+            context.fillStyle = "rgb(255,0,0)"; //Red
+            context.fillText("GAME OVER",150,315,300);
+
+
+
+            //Change text over the board
+            time.innerHTML = 'Gra trwała ' + self.time + 's';
+            score.innerHTML = 'Zdobyłeś ' + self.score + 'punktów';
+
+            //Show "Start Button" again
+            startButton.style.visibility = "visible";
+
+            //Remove of keyDown listener after game
+            document.removeEventListener('keydown', keyDownReader);
         };
 
     }
+
 
 
     const GameVar = new Game();
@@ -326,7 +518,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     startButton.addEventListener('click', function () {
 
-        if(GameVar.stateOfGame === 0) {
+
+            //Hide "Start Button"
+            startButton.style.visibility = "hidden";
 
             //Read set settings
             GameVar.settings.X = inputX.value;
@@ -334,18 +528,16 @@ document.addEventListener('DOMContentLoaded', function () {
             GameVar.settings.speed = speed.value;
             GameVar.settings.level = level.value;
 
-
-            //Initialization of game
-
             //Generation of obstacles
             GameVar.board =  new Board(GameVar.settings.level);
 
-            //Genertation of snake
+            //Generation of snake
             GameVar.snake =  new Snake(GameVar.settings.X);
 
             //Send information about obstacles to apple
             GameVar.apple =  new Apple(GameVar.board.obstaclePositionX, GameVar.board.obstaclePositionY,);
 
+            GameVar.powerUp = new PowerUp(GameVar.board.obstaclePositionX, GameVar.board.obstaclePositionY,);
             //Generate Apple position
             GameVar.apple.generateNewLocation();
 
@@ -353,32 +545,14 @@ document.addEventListener('DOMContentLoaded', function () {
             GameVar.render();
 
             //Add keydown listener
-            document.addEventListener('keydown', function (event) {
-                GameVar.snake.setDirection(event.keyCode);
-            });
+            document.addEventListener('keydown', keyDownReader);
 
             //Start of game
             GameVar.startGame();
 
-            //Change local variabels and look
-            startButton.innerHTML = 'Zakończ';
+            //Change local variables
             GameVar.stateOfGame = 1;
 
-        } else {
-
-            //End game
-            GameVar.gameOver();
-            GameVar.stateOfGame = 0;
-            //Change look
-            startButton.innerHTML = 'Rozpocznij od nowa';
-            time.innerHTML = 'Gra trwała ' + GameVar.time + 's';
-            score.innerHTML = 'Twój wynik: ' + GameVar.score;
-
-            GameVar.score = 0;
-            GameVar.time = 0;
-
-
-        }
     });
 
 });
