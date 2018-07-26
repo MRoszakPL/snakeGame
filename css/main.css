@@ -1,5 +1,14 @@
 .settings{
     display: flex;
     flex-direction: column;
+}
 
+.gameFrame{
+    display: flex;
+    justify-content: center;
+}
+
+#game{
+    margin: 1rem 1rem;
+    border: 1px solid black;
 }

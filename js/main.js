@@ -1,5 +1,12 @@
 document.addEventListener('DOMContentLoaded', function () {
 
+
+
+    const game = document.getElementById('game');
+    const context = game.getContext('2d');
+
+    context.fillStyle = "rgb(0,128,0)"; //Green
+
     function Snake( variableX) {
 
         this.positionsX = [1,2,3];
@@ -115,31 +122,31 @@ document.addEventListener('DOMContentLoaded', function () {
         //Creating random obstacles on the board
         switch(parseInt(level)){
             case 1:
-                for(let i = 0; i<10; i++) {
+                for(let i = 0; i<30; i++) {
                     this.obstaclePositionX.push( Math.round(Math.random()*(34))+5);
                     this.obstaclePositionY.push( Math.round(Math.random()*(-39)));
                 }
                 break;
             case 2:
-                for(let i = 0; i<14; i++) {
+                for(let i = 0; i<40; i++) {
                     this.obstaclePositionX.push( Math.round(Math.random()*(34))+5);
                     this.obstaclePositionY.push( Math.round(Math.random()*(-39)));
                 }
                 break;
             case 3:
-                for(let i = 0; i<18; i++) {
+                for(let i = 0; i<60; i++) {
                     this.obstaclePositionX.push( Math.round(Math.random()*(34))+5);
                     this.obstaclePositionY.push( Math.round(Math.random()*(-39)));
                 }
                 break;
             case 4:
-                for(let i = 0; i<22; i++) {
+                for(let i = 0; i<80; i++) {
                     this.obstaclePositionX.push( Math.round(Math.random()*(34))+5);
                     this.obstaclePositionY.push( Math.round(Math.random()*(-39)));
                 }
                 break;
             case 5:
-                for(let i = 0; i<26; i++) {
+                for(let i = 0; i<100; i++) {
                     this.obstaclePositionX.push( Math.round(Math.random()*(34))+5);
                     this.obstaclePositionY.push( Math.round(Math.random()*(-39)));
                 }
@@ -152,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function () {
         this.positionX = [];
         this.positionY = [];
         
-        this.setNewPosition = function(){
+        this.generateNewLocation = function(){
             
         }
     }
@@ -179,20 +186,57 @@ document.addEventListener('DOMContentLoaded', function () {
         this.gameTimer= 0;
         this.stateOfGame = 0;
 
+        this.render = function () {
+
+            self.renderObstacles();
+            self.renderSnake();
+        }
+
+        this.renderObstacles = function () {
+            context.fillStyle = "rgb(0,0,0)"; //Black
+            for(let i = 0; i<this.board.obstaclePositionX.length; i++){
+                context.fillRect(this.board.obstaclePositionX[i]*10,this.board.obstaclePositionY[i]*-10, 10, 10);
+            }
+        };
+
+        this.renderSnake = function () {
+            context.fillStyle = "rgb(0,128,0)"; //Dark Green
+            for(let i = 0; i<this.snake.length-this.settings.X; i++){
+                context.fillRect(this.snake.positionsX[i]*10,this.snake.positionsY[i]*-10, 10, 10);
+            }
+        };
+
+        this.renderApple = function () {
+            context.fillStyle = "rgb(0,255,0)"; //Green
+        };
+
+
+        this.renderPowerUp = function () {
+            context.fillStyle = "rgb(255,255,102)"; //Yellow
+        };
+
         this.startGame = function () {
                 this.gameTimer = setInterval(function () {
                 self.snake.move();
                 self.time ++;
+                context.clearRect(0, 0, 400, 400);
+                self.render();
+
             }, 1000)
         };
 
         this.gameOver = function () {
             clearInterval(this.gameTimer);
+            context.clearRect(0, 0, 400, 400);
         };
+
+
 
     }
 
     const GameVar = new Game();
+
+
 
     const inputX = document.querySelector('#valueX');
     const inputY = document.querySelector('#valueY');
@@ -206,8 +250,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const startButton = document.querySelector('.startButton');
 
     startButton.addEventListener('click', function () {
-        if(GameVar.stateOfGame === 0) {
 
+        if(GameVar.stateOfGame === 0) {
 
             //Read set settings
             GameVar.settings.X = inputX.value;
@@ -220,6 +264,8 @@ document.addEventListener('DOMContentLoaded', function () {
             GameVar.board =  new Board(GameVar.settings.level);
             GameVar.snake =  new Snake(GameVar.settings.X);
             GameVar.apple =  new Apple();
+
+            GameVar.render();
 
             document.addEventListener('keydown', function (event) {
                 GameVar.snake.setDirection(event.keyCode);
