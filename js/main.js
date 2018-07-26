@@ -8,8 +8,8 @@ document.addEventListener('DOMContentLoaded', function () {
         this.direction = 'right';
         this.lastOppositeDirection = 'left';
 
-        this.setDirection = function (direction) {
 
+        this.setDirection = function (direction) {
 
             switch (direction) {
                 case 37:
@@ -40,7 +40,6 @@ document.addEventListener('DOMContentLoaded', function () {
         };
 
         this.move = function () {
-            console.log('Poruszam się' + this.direction);
 
                 switch(this.direction){
 
@@ -88,13 +87,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 console.log(this.positionsX);
                 console.log(this.positionsY);
-                console.log(this.lastOppositeDirection);
 
                 this.arraylength = this.positionsX.length;
 
-                console.log(this.arraylength);
-                console.log(this.length);
-
+                //Shorten table of positions if needed
                 if(this.arraylength === this.length){
                     this.positionsX = this.positionsX.slice(1,this.arraylength);
                     this.positionsY = this.positionsY.slice(1,this.arraylength);
@@ -113,7 +109,42 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function Board(level) {
+        this.obstaclePositionX = [];
+        this.obstaclePositionY = [];
 
+        //Creating random obstacles on the board
+        switch(parseInt(level)){
+            case 1:
+                for(let i = 0; i<10; i++) {
+                    this.obstaclePositionX.push( Math.round(Math.random()*(34))+5);
+                    this.obstaclePositionY.push( Math.round(Math.random()*(-39)));
+                }
+                break;
+            case 2:
+                for(let i = 0; i<14; i++) {
+                    this.obstaclePositionX.push( Math.round(Math.random()*(34))+5);
+                    this.obstaclePositionY.push( Math.round(Math.random()*(-39)));
+                }
+                break;
+            case 3:
+                for(let i = 0; i<18; i++) {
+                    this.obstaclePositionX.push( Math.round(Math.random()*(34))+5);
+                    this.obstaclePositionY.push( Math.round(Math.random()*(-39)));
+                }
+                break;
+            case 4:
+                for(let i = 0; i<22; i++) {
+                    this.obstaclePositionX.push( Math.round(Math.random()*(34))+5);
+                    this.obstaclePositionY.push( Math.round(Math.random()*(-39)));
+                }
+                break;
+            case 5:
+                for(let i = 0; i<26; i++) {
+                    this.obstaclePositionX.push( Math.round(Math.random()*(34))+5);
+                    this.obstaclePositionY.push( Math.round(Math.random()*(-39)));
+                }
+                break;
+        }
     }
 
     function Apple() {
@@ -151,6 +182,7 @@ document.addEventListener('DOMContentLoaded', function () {
         this.startGame = function () {
                 this.gameTimer = setInterval(function () {
                 self.snake.move();
+                self.time ++;
             }, 1000)
         };
 
