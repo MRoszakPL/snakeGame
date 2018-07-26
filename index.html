@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <link href="css/main.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+
+    <div class="gameFrame">
+
+    </div>
+
+    <div class="settings">
+        <label> Zmienna X
+        <input type="number" id="valueX"/>
+        </label>
+        <label> Zmienna Y
+            <input type="number" id="valueY"/>
+        </label>
+        <label> Prędkość węża
+            <input type="number" id="speed"/>
+        </label>
+        <label> Poziom Trudności
+            <select id="level">
+                <option selected value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+        </label>
+
+        <button class="startButton">Start</button>
+    </div>
+
+    <div class="scoreboard">
+        <h2>Tablica wyników</h2>
+        <ol id="scoreList">
+
+        </ol>
+    </div>
+
+
+<script src="js/main.js"></script>
+</body>
+</html>
