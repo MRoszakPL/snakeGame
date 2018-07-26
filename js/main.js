@@ -5,7 +5,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const game = document.getElementById('game');
     const context = game.getContext('2d');
 
-    context.fillStyle = "rgb(0,128,0)"; //Green
+    const inputX = document.querySelector('#valueX');
+    const inputY = document.querySelector('#valueY');
+    const speed = document.querySelector('#speed');
+    const level = document.querySelector('#level');
+    const time = document.querySelector('#timer');
+    const score = document.querySelector('#score');
+    const startButton = document.querySelector('.startButton');
+
 
     function Snake( variableX) {
 
@@ -122,45 +129,93 @@ document.addEventListener('DOMContentLoaded', function () {
         //Creating random obstacles on the board
         switch(parseInt(level)){
             case 1:
-                for(let i = 0; i<30; i++) {
-                    this.obstaclePositionX.push( Math.round(Math.random()*(34))+5);
-                    this.obstaclePositionY.push( Math.round(Math.random()*(-39)));
+                for(let i = 0; i<40; i++) {
+                    let positionX = Math.round(Math.random()*(39));
+                    this.obstaclePositionX.push( positionX );
+                    if(positionX > 5){
+                        this.obstaclePositionY.push( Math.round(Math.random()*(-39)));
+                    } else {
+                        this.obstaclePositionY.push( Math.round(Math.random()*(-37))-2);
+                    }
                 }
                 break;
             case 2:
-                for(let i = 0; i<40; i++) {
-                    this.obstaclePositionX.push( Math.round(Math.random()*(34))+5);
-                    this.obstaclePositionY.push( Math.round(Math.random()*(-39)));
+                for(let i = 0; i<80; i++) {
+                    let positionX = Math.round(Math.random()*(39));
+                    this.obstaclePositionX.push( positionX );
+                    if(positionX > 5){
+                        this.obstaclePositionY.push( Math.round(Math.random()*(-39)));
+                    } else {
+                        this.obstaclePositionY.push( Math.round(Math.random()*(-37))-2);
+                    }
                 }
                 break;
             case 3:
-                for(let i = 0; i<60; i++) {
-                    this.obstaclePositionX.push( Math.round(Math.random()*(34))+5);
-                    this.obstaclePositionY.push( Math.round(Math.random()*(-39)));
+
+                for(let i = 0; i<120; i++) {
+                    let positionX = Math.round(Math.random()*(39));
+                    this.obstaclePositionX.push( positionX );
+                    if(positionX > 5){
+                        this.obstaclePositionY.push( Math.round(Math.random()*(-39)));
+                    } else {
+                        this.obstaclePositionY.push( Math.round(Math.random()*(-37))-2);
+                    }
                 }
                 break;
             case 4:
-                for(let i = 0; i<80; i++) {
-                    this.obstaclePositionX.push( Math.round(Math.random()*(34))+5);
-                    this.obstaclePositionY.push( Math.round(Math.random()*(-39)));
+
+                for(let i = 0; i<160; i++) {
+                    let positionX = Math.round(Math.random()*(39));
+                    this.obstaclePositionX.push( positionX );
+                    if(positionX > 5){
+                        this.obstaclePositionY.push( Math.round(Math.random()*(-39)));
+                    } else {
+                        this.obstaclePositionY.push( Math.round(Math.random()*(-37))-2);
+                    }
                 }
                 break;
             case 5:
-                for(let i = 0; i<100; i++) {
-                    this.obstaclePositionX.push( Math.round(Math.random()*(34))+5);
-                    this.obstaclePositionY.push( Math.round(Math.random()*(-39)));
+
+                for(let i = 0; i<200; i++) {
+                    let positionX = Math.round(Math.random()*(39));
+                    this.obstaclePositionX.push( positionX );
+                    if(positionX > 5){
+                        this.obstaclePositionY.push( Math.round(Math.random()*(-39)));
+                    } else {
+                        this.obstaclePositionY.push( Math.round(Math.random()*(-37))-2);
+                    }
                 }
                 break;
         }
     }
 
-    function Apple() {
+    function Apple(positionsX, positionsY) {
+
+
+        this.obstacles = {
+            positionsX: positionsX,
+            positionsY: positionsY
+        }
 
         this.positionX = [];
         this.positionY = [];
         
         this.generateNewLocation = function(){
-            
+            let i = 0;
+
+            while(i!==1){
+                this.positionX = Math.round((Math.random()*35)+4);
+                this.positionY = Math.round((Math.random()-39));
+                let check =false;
+                for(let j = 0; j<this.obstacles.positionsX.length; j++){
+                    if(this.positionX === this.obstacles.positionsX[j] && this.positionY === this.obstacles.positionsY[j]){
+                        check = true;
+                    }
+                }
+                if(check === false) {
+                    i=1;
+                }
+            }
         }
     }
 
@@ -179,18 +234,16 @@ document.addEventListener('DOMContentLoaded', function () {
             speed: 1
         };
 
-
-
         this.score = 0;
         this.scoreboard = [];
         this.gameTimer= 0;
         this.stateOfGame = 0;
 
         this.render = function () {
-
             self.renderObstacles();
             self.renderSnake();
-        }
+            self.renderApple();
+        };
 
         this.renderObstacles = function () {
             context.fillStyle = "rgb(0,0,0)"; //Black
@@ -208,6 +261,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         this.renderApple = function () {
             context.fillStyle = "rgb(0,255,0)"; //Green
+            context.fillRect(this.apple.positionX*10,this.apple.positionY*-10, 10, 10);
+
         };
 
 
@@ -215,14 +270,33 @@ document.addEventListener('DOMContentLoaded', function () {
             context.fillStyle = "rgb(255,255,102)"; //Yellow
         };
 
-        this.startGame = function () {
-                this.gameTimer = setInterval(function () {
-                self.snake.move();
-                self.time ++;
-                context.clearRect(0, 0, 400, 400);
-                self.render();
 
-            }, 1000)
+        this.checkColisionApple = function () {
+            if(self.apple.positionX === self.snake.positionsX[self.snake.positionsX.length-1] && self.apple.positionY === self.snake.positionsY[self.snake.positionsY.length-1] ){
+                self.apple.generateNewLocation();
+                self.score+=50;
+            }
+        }
+
+        this.startGame = function () {
+            let counter = 0;
+            this.gameTimer = setInterval(function () {
+
+                    if(counter%10 === 0){
+                        self.time ++;
+                        time.innerHTML = 'Gra trwa ' + self.time + 's';
+                    }
+
+                    if(counter%1 === 0){
+                        self.snake.move();
+                        context.clearRect(0, 0, 400, 400);
+                        self.render();
+                        self.checkColisionApple();
+                        score.innerHTML = 'Twój wynik: ' + self.score;
+                    }
+                    counter++;
+
+            }, 100)
         };
 
         this.gameOver = function () {
@@ -230,24 +304,15 @@ document.addEventListener('DOMContentLoaded', function () {
             context.clearRect(0, 0, 400, 400);
         };
 
-
-
     }
+
 
     const GameVar = new Game();
 
-
-
-    const inputX = document.querySelector('#valueX');
-    const inputY = document.querySelector('#valueY');
-    const speed = document.querySelector('#speed');
-    const level = document.querySelector('#level');
-
+    //Set default values on settings inputs
     inputX.value = GameVar.settings.X;
     inputY.value = GameVar.settings.Y;
     speed.value = GameVar.settings.speed;
-
-    const startButton = document.querySelector('.startButton');
 
     startButton.addEventListener('click', function () {
 
@@ -261,12 +326,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
             //Initialization of game
-            GameVar.board =  new Board(GameVar.settings.level);
-            GameVar.snake =  new Snake(GameVar.settings.X);
-            GameVar.apple =  new Apple();
 
+            //Generation of obstacles
+            GameVar.board =  new Board(GameVar.settings.level);
+
+            //Genertation of snake
+            GameVar.snake =  new Snake(GameVar.settings.X);
+
+            //Send information about obstacles to apple
+            GameVar.apple =  new Apple(GameVar.board.obstaclePositionX, GameVar.board.obstaclePositionY,);
+
+            //Generate Apple position
+            GameVar.apple.generateNewLocation();
+
+            //Rendering game
             GameVar.render();
 
+            //Add keydown listener
             document.addEventListener('keydown', function (event) {
                 GameVar.snake.setDirection(event.keyCode);
             });
@@ -274,12 +350,18 @@ document.addEventListener('DOMContentLoaded', function () {
             //Start of game
             GameVar.startGame();
 
+            //Change local variabels and look
             startButton.innerHTML = 'Zakończ';
             GameVar.stateOfGame = 1;
 
         } else {
+
+            //End game
             GameVar.gameOver();
             GameVar.stateOfGame = 0;
+            GameVar.score = 0;
+            GameVar.time = 0;
+            //Change look
             startButton.innerHTML = 'Rozpocznij od nowa';
         }
     });
