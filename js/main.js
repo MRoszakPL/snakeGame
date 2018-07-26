@@ -98,10 +98,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         break;
                 }
 
-
-                console.log(this.positionsX);
-                console.log(this.positionsY);
-
                 this.arraylength = this.positionsX.length;
 
                 //Shorten table of positions if needed
@@ -205,7 +201,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
             while(i!==1){
                 this.positionX = Math.round((Math.random()*35)+4);
-                this.positionY = Math.round((Math.random()-39));
+                this.positionY = Math.round((Math.random()*-39));
+                console.log(this.positionY);
+
+
                 let check =false;
                 for(let j = 0; j<this.obstacles.positionsX.length; j++){
                     if(this.positionX === this.obstacles.positionsX[j] && this.positionY === this.obstacles.positionsY[j]){
@@ -271,8 +270,9 @@ document.addEventListener('DOMContentLoaded', function () {
         };
 
 
-        this.checkColisionApple = function () {
+        this.checkCollisionApple = function () {
             if(self.apple.positionX === self.snake.positionsX[self.snake.positionsX.length-1] && self.apple.positionY === self.snake.positionsY[self.snake.positionsY.length-1] ){
+                self.snake.lengthenSnake(1);
                 self.apple.generateNewLocation();
                 self.score+=50;
             }
@@ -291,7 +291,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         self.snake.move();
                         context.clearRect(0, 0, 400, 400);
                         self.render();
-                        self.checkColisionApple();
+                        self.checkCollisionApple();
                         score.innerHTML = 'Twój wynik: ' + self.score;
                     }
                     counter++;
@@ -359,10 +359,15 @@ document.addEventListener('DOMContentLoaded', function () {
             //End game
             GameVar.gameOver();
             GameVar.stateOfGame = 0;
-            GameVar.score = 0;
-            GameVar.time = 0;
             //Change look
             startButton.innerHTML = 'Rozpocznij od nowa';
+            time.innerHTML = 'Gra trwała ' + GameVar.time + 's';
+            score.innerHTML = 'Twój wynik: ' + GameVar.score;
+
+            GameVar.score = 0;
+            GameVar.time = 0;
+
+
         }
     });
 
