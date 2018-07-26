@@ -276,6 +276,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 self.apple.generateNewLocation();
                 self.score+=50;
             }
+        };
+
+
+        this.checkCollisionWithSnake = function () {
+            for(let i = 0; i< self.snake.positionsX.length-1; i++){
+                if(self.snake.positionsX[self.snake.positionsX.length-1] === self.snake.positionsX[i] && self.snake.positionsY[self.snake.positionsY.length-1] === self.snake.positionsY[i]){
+                    self.gameOver();
+                }
+            }
         }
 
         this.startGame = function () {
@@ -292,6 +301,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         context.clearRect(0, 0, 400, 400);
                         self.render();
                         self.checkCollisionApple();
+                        self.checkCollisionWithSnake();
                         score.innerHTML = 'Twój wynik: ' + self.score;
                     }
                     counter++;
