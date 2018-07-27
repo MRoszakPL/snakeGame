@@ -23,6 +23,13 @@
     height: 5vh;
 }
 
+.scoreboard{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
 #game{
     position: relative;
     margin: 1rem 1rem;

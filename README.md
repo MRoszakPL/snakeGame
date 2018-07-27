@@ -38,4 +38,4 @@ Your 5 best scores will be saved until you close the page.
 On the bottom u have Tester menu, where u can choose one type of powerup in game or random.
 
 ### How it looks like 
-![alt text](https://image.ibb.co/mUYuto/snake.png)
+![alt text](https://image.ibb.co/cJHyKT/snake2.png)
