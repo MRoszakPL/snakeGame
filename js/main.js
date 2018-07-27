@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', function () {
 
     const game = document.getElementById('game');
@@ -8,20 +7,23 @@ document.addEventListener('DOMContentLoaded', function () {
     const inputY = document.querySelector('#valueY');
     const speed = document.querySelector('#speed');
     const level = document.querySelector('#level');
-    const time = document.querySelector('#timer');
+    const timerElement = document.querySelector('#timer');
     const score = document.querySelector('#score');
     const startButton = document.querySelector('.startButton');
+    const rewardInfo = document.querySelector('#reward');
+    const scoreList = document.querySelector('#scoreList');
+
 
     function keyDownReader(event) {
         event.preventDefault();
         GameVar.snake.setDirection(event.keyCode);
     }
 
-    function Snake( variableX) {
+    function Snake() {
 
         this.positionsX = [1,2,3];
         this.positionsY = [0,0,0];
-        this.length = 3 + parseInt(variableX);
+        this.length = 3;
         this.direction = 'right';
         this.lastOppositeDirection = 'left';
 
@@ -104,7 +106,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 this.arraylength = this.positionsX.length;
 
                 //Shorten table of positions if needed
-                if(this.arraylength === this.length){
+
+
+                if(this.arraylength > this.length){
                     this.positionsX = this.positionsX.slice(1,this.arraylength);
                     this.positionsY = this.positionsY.slice(1,this.arraylength);
                 }
@@ -113,12 +117,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         this.shortenSnake = function (length) {
 
-
-            console.log(this.positionsY);
-            console.log(this.positionsX);
-
-
-            console.log(this.length);
             this.length = this.length - parseInt(length);
 
 
@@ -126,17 +124,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 this.length = 3;
             }
 
-            console.log(this.length)
-            let arraylength = this.positionsX.length;
+            this.positionsX = this.positionsX.slice((-this.length));
+            this.positionsY = this.positionsY.slice((-this.length));
 
-            console.log(this.positionsX.length);
-
-            this.positionsX = this.positionsX.slice((-this.length+1));
-            this.positionsY = this.positionsY.slice((-this.length+1));
-
-            console.log(this.positionsX.length);
-            console.log( this.positionsY);
-            console.log( this.positionsX);
         };
 
         this.lengthenSnake = function (length) {
@@ -230,7 +220,6 @@ document.addEventListener('DOMContentLoaded', function () {
             while(i!==1){
                 this.positionX = Math.round((Math.random()*35)+4);
                 this.positionY = Math.round((Math.random()*-39));
-                console.log(this.positionY);
 
                 let check =false;
                 for(let j = 0; j<this.obstacles.positionsX.length; j++){
@@ -257,14 +246,17 @@ document.addEventListener('DOMContentLoaded', function () {
         this.positionX = 0;
         this.positionY = 0;
         this.powerUpMuliplier = 1;
-
+        this.showPowerUp = false;
+        this.powerUpTimer = 0;
+        this.colorOfPowerUp = "rgb(255, 255 , 0)";
+        this.specialSetting = 'random';
         this.generateProperties = function () {
+
             let i = 0;
 
-            while(i!==1){
+                while(i!==1){
                 this.positionX = Math.round((Math.random()*39));
                 this.positionY = Math.round((Math.random()*-39));
-                console.log(this.positionY);
 
                 let check =false;
                 for(let j = 0; j<this.obstacles.positionsX.length; j++){
@@ -273,13 +265,104 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
 
-                this.typeOfPowerUp = 0.5;//Math.random()*6;
+
 
                 if(check === false) {
                     i=1;
                 }
             }
+
+
+            if(this.specialSetting === 'random'){
+                this.typeOfPowerUp = Math.random()*6;
+            } else {
+                switch (this.specialSetting) {
+                    case 'lengthen':
+                        this.typeOfPowerUp = 0.5;
+                        break;
+
+                        case 'shorten':
+                            this.typeOfPowerUp = 1.5;
+                            break;
+
+                        case 'faster':
+                            this.typeOfPowerUp = 2.5;
+                            break;
+
+                        case 'slower':
+                            this.typeOfPowerUp = 3.5;
+                            break;
+
+                        case 'points':
+                            this.typeOfPowerUp = 4.5;
+                            break;
+
+                        case 'invisibility':
+                            this.typeOfPowerUp = 4.5;
+                            break;
+                }
+            }
+
+            //Set different colors to different types of powerups
+            if(this.typeOfPowerUp<=1){
+                this.colorOfPowerUp = "rgb(255,192,203)"; //Pink
+            } else {
+                if(this.typeOfPowerUp<2 && this.typeOfPowerUp>1){
+                    this.colorOfPowerUp = "rgb(0,191,255)"; // Deepskyblue
+                } else {
+                    if(this.typeOfPowerUp<3 && this.typeOfPowerUp>=2){
+                        this.colorOfPowerUp = "rgb(238,130,238)"; //Violet
+                    } else {
+                        if(this.typeOfPowerUp<4 && this.typeOfPowerUp>=3){
+                            this.colorOfPowerUp = "rgb(255,69,0"; //Orangered
+                        } else {
+                            if(this.typeOfPowerUp<5 && this.typeOfPowerUp>=4){
+                                this.colorOfPowerUp = "rgb(139,0,0)"; //Darkred
+                            } else {
+                                this.colorOfPowerUp = "rgb(255, 255 , 0"; //Yellow
+                            }
+                        }
+                    }
+                }
+
+            }
+
+
+
         }
+
+    }
+
+    function ScoreBoard() {
+
+        this.arrayOfBestScores = [];
+
+
+            this.addResult = function (result) {
+
+                this.arrayOfBestScores.push(result);
+
+                this.arrayOfBestScores.sort(function (a,b) {
+                    return b-a;
+                });
+
+                if(this.arrayOfBestScores.length>5){
+                    this.arrayOfBestScores = this.arrayOfBestScores.slice(0,5);
+                }
+
+                while (scoreList.firstChild) {
+                    scoreList.removeChild(scoreList.firstChild);
+                }
+
+                for(let i = 0; i<this.arrayOfBestScores.length; i++){
+
+                    let listElement = document.createElement("li");
+                    listElement.innerText = this.arrayOfBestScores[i];
+                    scoreList.appendChild(listElement);
+                }
+
+            }
+
 
     }
 
@@ -290,8 +373,6 @@ document.addEventListener('DOMContentLoaded', function () {
         this.apple = 0;
         this.powerUp = 0;
         this.numberOfEatenApples = 0;
-        this.showPowerUp = false;
-        this.powerUpTimer = 0;
         this.invisible = false;
 
 
@@ -301,11 +382,11 @@ document.addEventListener('DOMContentLoaded', function () {
             X: 1,
             Y: 1,
             level: 1,
-            speed: 1
+            speed: 1,
+
         };
 
         this.score = 0;
-        this.scoreboard = [];
         this.gameTimer= 0;
 
 
@@ -318,7 +399,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         this.renderSnake = function () {
             context.fillStyle = "rgb(0,128,0)"; //Dark Green
-            for(let i = 0; i<this.snake.length-this.settings.X; i++){
+            for(let i = 0; i<this.snake.positionsX.length; i++){
                 context.fillRect(this.snake.positionsX[i]*15,this.snake.positionsY[i]*-15, 15, 15);
             }
         };
@@ -330,34 +411,34 @@ document.addEventListener('DOMContentLoaded', function () {
         };
 
         this.renderPowerUp = function () {
-            context.fillStyle = "rgb(255,255,102)"; //Yellow
+
+            context.fillStyle = this.powerUp.colorOfPowerUp; //Yellow
             context.fillRect(this.powerUp.positionX*15,this.powerUp.positionY*-15, 15, 15);
         };
 
         this.render = function () {
-            console.log('Lol');
-            self.renderObstacles();
-            self.renderSnake();
-            self.renderApple();
-            if(this.showPowerUp){
-                self.renderPowerUp();
+            this.renderObstacles();
+            this.renderSnake();
+            this.renderApple();
+            if( this.powerUp.showPowerUp){
+                this.renderPowerUp();
             }
         };
 
-
         //Checking collisions with specific of snake
         this.checkCollisionApple = function () {
+
             if(this.apple.positionX === this.snake.positionsX[this.snake.positionsX.length-1] && this.apple.positionY === this.snake.positionsY[this.snake.positionsY.length-1] ){
+
                 this.snake.lengthenSnake(1);
                 this.apple.generateNewLocation();
                 this.score= this.score + (50*this.settings.level*this.settings.speed);
 
-                console.log(this.snake.length);
                 this.numberOfEatenApples++;
 
                 if(this.numberOfEatenApples%2 === 0){
                     this.powerUp.generateProperties();
-                    this.showPowerUp = true;
+                    this.powerUp.showPowerUp = true;
                 }
             }
         };
@@ -382,51 +463,51 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if(this.powerUp.positionX === this.snake.positionsX[this.snake.positionsX.length-1] && this.powerUp.positionY === this.snake.positionsY[this.snake.positionsY.length-1] ){
 
-                this.showPowerUp = false;
-                if(self.powerUp.typeOfPowerUp<=1){
-                    self.snake.lengthenSnake(self.settings.X);
+                this.powerUp.showPowerUp = false;
+                if(this.powerUp.typeOfPowerUp<=1){
+                    this.snake.lengthenSnake(this.settings.X);
                     console.log('Wydłużanie');
 
                 } else {
-                    if(self.powerUp.typeOfPowerUp<2 && self.powerUp.typeOfPowerUp>1){
-                        self.snake.shortenSnake(self.settings.X);
+                    if(this.powerUp.typeOfPowerUp<2 && this.powerUp.typeOfPowerUp>1){
+                        this.snake.shortenSnake(self.settings.X);
                         console.log('Skracanie');
                     } else {
-                        if(self.powerUp.typeOfPowerUp<3 && self.powerUp.typeOfPowerUp>=2){
+                        if(this.powerUp.typeOfPowerUp<3 && this.powerUp.typeOfPowerUp>=2){
 
-                            self.powerUp.powerUpMuliplier = 2;
-                            self.powerUpTimer= setTimeout(
+                            this.powerUp.powerUpMuliplier = 2;
+                            this.powerUp.powerUpTimer= setTimeout(
                                 function () {
                                     self.powerUp.powerUpMuliplier = 1;
-                                    clearTimeout(self.powerUpTimer);
+                                    clearTimeout(self.powerUp.powerUpTimer);
                                 }
-                            , 1000*self.settings.Y);
+                            , 1000*this.settings.Y);
 
                             console.log('Przyspieszenie');
                         } else {
-                            if(self.powerUp.typeOfPowerUp<4 && self.powerUp.typeOfPowerUp>=3){
+                            if(this.powerUp.typeOfPowerUp<4 && this.powerUp.typeOfPowerUp>=3){
 
-                                self.powerUp.powerUpMuliplier = 0.5;
-                                self.powerUpTimer= setTimeout(
+                                this.powerUp.powerUpMuliplier = 0.5;
+                                this.powerUp.powerUpTimer= setTimeout(
                                     function () {
                                         self.powerUp.powerUpMuliplier = 1;
-                                        clearTimeout(self.powerUpTimer);
+                                        clearTimeout( self.powerUp.powerUpTimer);
                                     }
-                                    , 1000*self.settings.Y);
+                                    , 1000*this.settings.Y);
 
                                 console.log('Spowolnienie');
                             } else {
-                                if(self.powerUp.typeOfPowerUp<5 && self.powerUp.typeOfPowerUp>=4){
+                                if(this.powerUp.typeOfPowerUp<5 && this.powerUp.typeOfPowerUp>=4){
                                     this.score+= (50*this.settings.level*this.settings.speed)*this.settings.X;
                                     console.log('Punkty');
                                 } else {
-                                    self.invisible = true;
-                                    self.powerUpTimer= setTimeout(
+                                    this.invisible = true;
+                                    this.powerUp.powerUpTimer= setTimeout(
                                         function () {
                                             self.invisible = false;
-                                            clearTimeout(self.powerUpTimer);
+                                            clearTimeout( self.powerUp.powerUpTimer);
                                         }
-                                        , 1000*self.settings.Y);
+                                        , 1000*this.settings.Y);
                                     console.log('Przenikanie');
                                 }
                             }
@@ -440,14 +521,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
         };
 
-
         //Start game function
         this.startGame = function () {
 
             let counter = 0;
 
-            self.time = 0;
-            self.score =0;
+            this.time = 0;
+            this.score =0;
+            this.numberOfEatenApples =0;
 
             this.gameTimer = setInterval(function () {
 
@@ -461,7 +542,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         if(!self.invisible){
                             self.checkCollisionWithObstacles();
                         }
-                        if(self.showPowerUp){
+                        if(self.powerUp.showPowerUp ){
                             self.checkCollisionWithPowerUp();
                         }
 
@@ -470,7 +551,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 if(counter%1000 === 0){
                     self.time ++;
-                    time.innerHTML = 'Gra trwa ' + self.time + 's';
+                    timerElement.innerHTML = 'Gra trwa ' + self.time + 's';
                     counter = 0;
                 }
 
@@ -492,11 +573,11 @@ document.addEventListener('DOMContentLoaded', function () {
             context.fillStyle = "rgb(255,0,0)"; //Red
             context.fillText("GAME OVER",150,315,300);
 
-
-
             //Change text over the board
-            time.innerHTML = 'Gra trwała ' + self.time + 's';
-            score.innerHTML = 'Zdobyłeś ' + self.score + 'punktów';
+            timerElement.innerHTML = 'Koniec gry';
+            score.innerHTML = 'Zdobyłeś ' + this.score + 'punktów';
+
+            Scoreboard.addResult(this.score);
 
             //Show "Start Button" again
             startButton.style.visibility = "visible";
@@ -507,17 +588,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
     }
 
-
-
     const GameVar = new Game();
+    const Scoreboard = new ScoreBoard();
 
     //Set default values on settings inputs
     inputX.value = GameVar.settings.X;
     inputY.value = GameVar.settings.Y;
     speed.value = GameVar.settings.speed;
 
-    startButton.addEventListener('click', function () {
 
+    timerElement.innerHTML="Rozpocznij grę";
+
+    startButton.addEventListener('click', function () {
 
             //Hide "Start Button"
             startButton.style.visibility = "hidden";
@@ -527,6 +609,8 @@ document.addEventListener('DOMContentLoaded', function () {
             GameVar.settings.Y = inputY.value;
             GameVar.settings.speed = speed.value;
             GameVar.settings.level = level.value;
+
+            rewardInfo.innerHTML = 'Podstawa punktowa: '+ (50*GameVar.settings.level*GameVar.settings.speed);
 
             //Generation of obstacles
             GameVar.board =  new Board(GameVar.settings.level);
@@ -538,6 +622,9 @@ document.addEventListener('DOMContentLoaded', function () {
             GameVar.apple =  new Apple(GameVar.board.obstaclePositionX, GameVar.board.obstaclePositionY,);
 
             GameVar.powerUp = new PowerUp(GameVar.board.obstaclePositionX, GameVar.board.obstaclePositionY,);
+
+            GameVar.powerUp.specialSetting = document.querySelector('input[name="powerup"]:checked').value;
+
             //Generate Apple position
             GameVar.apple.generateNewLocation();
 
@@ -549,9 +636,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
             //Start of game
             GameVar.startGame();
-
-            //Change local variables
-            GameVar.stateOfGame = 1;
 
     });
 
