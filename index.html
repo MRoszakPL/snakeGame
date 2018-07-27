@@ -8,12 +8,11 @@
 </head>
 <body>
 
-
-
     <div class="gameFrame">
         <h2 id="timer">Gra trwa </h2>
 
         <h2 id="score">Twój wynik: 0</h2>
+        <h2 id="lengthOfSnake"> </h2>
 
         <canvas id="game" width="600" height="600">
             Twoja przeglądarka nie obsługuje elementu Canvas.
@@ -21,24 +20,22 @@
         <button class="startButton">Start</button>
     </div>
 
-
-
     <div class="settings">
 
-        <label> Zmienna X
+        <label> Zmienna X (Jednostka powerUpa)
         <input type="number" id="valueX"/>
         </label>
-        <label> Zmienna Y
+        <label> Zmienna Y (Długość powerUpa)
             <input type="number" id="valueY"/>
         </label>
-        <label> Prędkość węża
+        <label> Prędkość węża (Mnożniki punktów 0.5, 1, 2)
             <select id="speed">
                 <option value="0.5">0.5</option>
                 <option selected value="1">1</option>
                 <option value="2">2</option>
             </select>
         </label>
-        <label> Poziom Trudności
+        <label> Poziom Trudności (Mnożniki punktów 1, 1.2, 1.4, 1.6, 2)
             <select id="level">
                 <option selected value="1" data="1">1</option>
                 <option value="1.2" data="2">2</option>

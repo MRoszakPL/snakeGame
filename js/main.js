@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const startButton = document.querySelector('.startButton');
     const rewardInfo = document.querySelector('#reward');
     const scoreList = document.querySelector('#scoreList');
-
+    const snakeLength = document.querySelector('#lengthOfSnake');
 
     function keyDownReader(event) {
         event.preventDefault();
@@ -139,6 +139,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         this.obstaclePositionX = [];
         this.obstaclePositionY = [];
+
         this.levels = {
             level1: {posX: [
                     2,3,4,5,6,7,8,9,
@@ -254,7 +255,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
             let i = 0;
 
-                while(i!==1){
+            //Rand position of powerup until it's not on obstacle
+            while(i!==1){
                 this.positionX = Math.round((Math.random()*39));
                 this.positionY = Math.round((Math.random()*-39));
 
@@ -270,7 +272,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
 
-
+            //Check if special powerup was chosen. If not the pick is random
             if(this.specialSetting === 'random'){
                 this.typeOfPowerUp = Math.random()*6;
             } else {
@@ -336,36 +338,38 @@ document.addEventListener('DOMContentLoaded', function () {
         this.arrayOfBestScores = [];
 
 
-            this.addResult = function (result) {
+        //Add result to scoreboard
+        this.addResult = function (result) {
 
-                this.arrayOfBestScores.push(result);
+            this.arrayOfBestScores.push(result);
 
-                this.arrayOfBestScores.sort(function (a,b) {
-                    return b-a;
-                });
+            this.arrayOfBestScores.sort(function (a,b) {
+                return b-a;
+            });
 
-                if(this.arrayOfBestScores.length>5){
-                    this.arrayOfBestScores = this.arrayOfBestScores.slice(0,5);
-                }
-
-                while (scoreList.firstChild) {
-                    scoreList.removeChild(scoreList.firstChild);
-                }
-
-                for(let i = 0; i<this.arrayOfBestScores.length; i++){
-
-                    let listElement = document.createElement("li");
-                    listElement.innerText = this.arrayOfBestScores[i];
-                    scoreList.appendChild(listElement);
-                }
-
+            //If the array is longer than 5 delete the lowest score
+            if(this.arrayOfBestScores.length>5){
+                this.arrayOfBestScores = this.arrayOfBestScores.slice(0,5);
             }
 
+            //Clearing scoreboard
+            while (scoreList.firstChild) {
+                scoreList.removeChild(scoreList.firstChild);
+            }
 
+            //Filling scoreboard with array elements
+            for(let i = 0; i<this.arrayOfBestScores.length; i++){
+
+                let listElement = document.createElement("li");
+                listElement.innerText = this.arrayOfBestScores[i];
+                scoreList.appendChild(listElement);
+            }
+        }
     }
 
     function Game(){
 
+        const self = this;
         this.snake = 0;
         this.board = 0;
         this.apple = 0;
@@ -374,11 +378,11 @@ document.addEventListener('DOMContentLoaded', function () {
         this.invisible = false;
 
 
-        const self = this;
+
         this.time = 0;
         this.settings = {
-            X: 1,
-            Y: 1,
+            X: 5,
+            Y: 5,
             level: 1,
             speed: 1,
             chosenLevel: 0
@@ -387,7 +391,7 @@ document.addEventListener('DOMContentLoaded', function () {
         this.score = 0;
         this.gameTimer= 0;
 
-
+        //Rendering each element of game
         this.renderObstacles = function () {
             context.fillStyle = "rgb(0,0,0)"; //Black
             for(let i = 0; i<this.board.obstaclePositionX.length; i++){
@@ -418,7 +422,7 @@ document.addEventListener('DOMContentLoaded', function () {
             this.renderObstacles();
             this.renderSnake();
             this.renderApple();
-            if( this.powerUp.showPowerUp){
+            if(this.powerUp.showPowerUp){
                 this.renderPowerUp();
             }
         };
@@ -431,9 +435,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 this.snake.lengthenSnake(1);
                 this.apple.generateNewLocation();
                 this.score= this.score + (50*this.settings.level*this.settings.speed);
-
+                snakeLength.innerHTML = "Długość węża: " + this.snake.length;
                 this.numberOfEatenApples++;
 
+                //If 2 apples were eaten. PowerUp will appear
                 if(this.numberOfEatenApples%2 === 0){
                     this.powerUp.generateProperties();
                     this.powerUp.showPowerUp = true;
@@ -442,17 +447,17 @@ document.addEventListener('DOMContentLoaded', function () {
         };
 
         this.checkCollisionWithSnake = function () {
-            for(let i = 0; i< self.snake.positionsX.length-1; i++){
-                if(self.snake.positionsX[self.snake.positionsX.length-1] === self.snake.positionsX[i] && self.snake.positionsY[self.snake.positionsY.length-1] === self.snake.positionsY[i]){
-                    self.gameOver();
+            for(let i = 0; i< this.snake.positionsX.length-1; i++){
+                if(this.snake.positionsX[this.snake.positionsX.length-1] === this.snake.positionsX[i] && this.snake.positionsY[this.snake.positionsY.length-1] === this.snake.positionsY[i]){
+                    this.gameOver();
                 }
             }
         };
 
         this.checkCollisionWithObstacles = function () {
-            for(let i = 0; i< self.board.obstaclePositionX.length; i++){
-                if(self.snake.positionsX[self.snake.positionsX.length-1] === self.board.obstaclePositionX[i] && self.snake.positionsY[self.snake.positionsY.length-1] === self.board.obstaclePositionY[i]){
-                    self.gameOver();
+            for(let i = 0; i< this.board.obstaclePositionX.length; i++){
+                if(this.snake.positionsX[this.snake.positionsX.length-1] === this.board.obstaclePositionX[i] && this.snake.positionsY[this.snake.positionsY.length-1] === this.board.obstaclePositionY[i]){
+                    this.gameOver();
                 }
             }
         };
@@ -464,11 +469,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 this.powerUp.showPowerUp = false;
                 if(this.powerUp.typeOfPowerUp<=1){
                     this.snake.lengthenSnake(this.settings.X);
+                    snakeLength.innerHTML = "Długość węża: " + GameVar.snake.length;
                     console.log('Wydłużanie');
 
                 } else {
                     if(this.powerUp.typeOfPowerUp<2 && this.powerUp.typeOfPowerUp>1){
                         this.snake.shortenSnake(self.settings.X);
+                        snakeLength.innerHTML = "Długość węża: " + GameVar.snake.length;
                         console.log('Skracanie');
                     } else {
                         if(this.powerUp.typeOfPowerUp<3 && this.powerUp.typeOfPowerUp>=2){
@@ -615,9 +622,6 @@ document.addEventListener('DOMContentLoaded', function () {
             GameVar.settings.speed = speed.value;
             GameVar.settings.level = level.value;
 
-
-            rewardInfo.innerHTML = 'Podstawa punktowa: '+ (50*GameVar.settings.level*GameVar.settings.speed);
-
             //Generation of obstacles
             GameVar.board =  new Board(GameVar.settings.level);
 
@@ -629,10 +633,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
             GameVar.powerUp = new PowerUp(GameVar.board.obstaclePositionX, GameVar.board.obstaclePositionY,);
 
-            GameVar.powerUp.specialSetting = document.querySelector('input[name="powerup"]:checked').value;
-
             //Generate Apple position
             GameVar.apple.generateNewLocation();
+
+            //Get info if special type of powerUp is chosen
+            GameVar.powerUp.specialSetting = document.querySelector('input[name="powerup"]:checked').value;
+
+            //Change text on page
+            rewardInfo.innerHTML = 'Podstawa punktowa: '+ (50*GameVar.settings.level*GameVar.settings.speed);
+            snakeLength.innerHTML = "Długość węża: " + GameVar.snake.length;
 
             //Rendering game
             GameVar.render();
