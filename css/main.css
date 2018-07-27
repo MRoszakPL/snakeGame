@@ -1,6 +1,6 @@
 .settings{
     display: flex;
-    flex-direction: column;
+    justify-content: space-around;
 }
 
 .gameFrame{
@@ -8,9 +8,24 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    margin-bottom: 1rem;
+}
+
+.testerMenu{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.startButton{
+    width: 40%;
+    height: 5vh;
 }
 
 #game{
+    position: relative;
     margin: 1rem 1rem;
     border: 1px solid black;
 }
+
