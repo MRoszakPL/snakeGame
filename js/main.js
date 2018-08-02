@@ -1,8 +1,6 @@
 const Game = require('./game');
 
 document.addEventListener('DOMContentLoaded', function () {
-
-
     const inputX = document.querySelector('#valueX');
     const inputY = document.querySelector('#valueY');
     const speed = document.querySelector('#speed');
@@ -10,40 +8,33 @@ document.addEventListener('DOMContentLoaded', function () {
     const rewardInfo = document.querySelector('#reward');
     const startButton = document.querySelector('.startButton');
 
-    const GameVar = new Game();
+    const newGame = new Game();
 
-    //Set default values on settings inputs
-    inputX.value = GameVar.settings.X;
-    inputY.value = GameVar.settings.Y;
-    speed.value = GameVar.settings.speed;
+    // Set default values on settings inputs
+    inputX.value = newGame.settings.X;
+    inputY.value = newGame.settings.Y;
+    speed.value = newGame.settings.speed;
 
     startButton.addEventListener('click', function () {
+        // Read set settings
+        newGame.settings.X = inputX.value;
+        newGame.settings.Y = inputY.value;
+        newGame.settings.speed = speed.value;
+        newGame.settings.level = level.value;
 
-            //Read set settings
-            GameVar.settings.X = inputX.value;
-            GameVar.settings.Y = inputY.value;
-            GameVar.settings.speed = speed.value;
-            GameVar.settings.level = level.value;
+        // Get info if special type of powerUp is chosen
+        newGame.powerUp.specialSetting = document.querySelector('input[name="powerup"]:checked').value;
 
-            //Get info if special type of powerUp is chosen
-            GameVar.powerUp.specialSetting = document.querySelector('input[name="powerup"]:checked').value;
+        // Change text on page
+        rewardInfo.innerHTML = 'Podstawa punktowa: ' + (50 * newGame.settings.level * newGame.settings.speed);
 
-            //Change text on page
-            rewardInfo.innerHTML = 'Podstawa punktowa: '+ (50*GameVar.settings.level*GameVar.settings.speed);
+        // Add keydown listener
+        document.addEventListener('keydown', newGame.keyDownReader);
 
-            //Add keydown listener
-            document.addEventListener('keydown', GameVar.keyDownReader);
+        // Start of game
+        newGame.startGame();
 
-            //Start of game
-            GameVar.startGame();
-
-            //Rendering game
-            GameVar.render();
-
-
-
-
-
-    });
-
+        // Rendering game
+        newGame.render();
+    })
 });

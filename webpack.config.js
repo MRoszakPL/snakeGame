@@ -1,6 +1,12 @@
+const path = require('path');
+
 module.exports = {
     entry: "./js/main.js",
-    output:  {filename: "./js/out.js"},
+    output: {
+        path: path.resolve(__dirname,'./js'),
+        filename: "out.js",
+
+    },
     mode: "development", watch: true,
     devtool:'#eval-source-map',
     module: {
